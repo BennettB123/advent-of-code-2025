@@ -1,0 +1,5 @@
+# Go output
+*.exe
+
+# My puzzle input (only keep test input in git)
+**input.txt
