@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func Day1_main(input []byte) {
-	starOne(input)
-	starTwo(input)
+func Day1(input []byte) {
+	day1_star1(input)
+	day1_star2(input)
 }
 
-func starOne(input []byte) {
+func day1_star1(input []byte) {
 	lines := strings.Lines(string(input))
 
 	numTimesZero := 0
@@ -52,7 +52,7 @@ func starOne(input []byte) {
 	fmt.Printf("Star 1 answer: %d \n", numTimesZero)
 }
 
-func starTwo(input []byte) {
+func day1_star2(input []byte) {
 	lines := strings.Lines(string(input))
 
 	numTimesZero := 0
