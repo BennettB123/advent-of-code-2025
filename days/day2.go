@@ -63,5 +63,59 @@ func day2_star1(input []byte) {
 }
 
 func day2_star2(input []byte) {
-	fmt.Printf("Star 2 answer: todo \n")
+	idRanges := make([]idRange, 0, 256)
+
+	for _, rangeStr := range strings.Split(string(input), ",") {
+		rangeStr = strings.TrimSpace(rangeStr)
+		split := strings.Split(rangeStr, "-")
+
+		start, err := strconv.Atoi(split[0])
+		if err != nil {
+			fmt.Printf("Expected int but got '%s'", split[0])
+			os.Exit(1)
+		}
+
+		end, err := strconv.Atoi(split[1])
+		if err != nil {
+			fmt.Printf("Expected int but got '%s'", split[1])
+			os.Exit(1)
+		}
+
+		idRanges = append(idRanges, idRange{start, end})
+	}
+
+	accumulator := 0
+	for _, r := range idRanges {
+		for i := range (r.end - r.start) + 1 {
+			id := r.start + i
+			idStr := strconv.Itoa(id)
+
+			halfLen := len(idStr) / 2
+
+			for numDigits := 1; numDigits <= halfLen; numDigits++ {
+				isRepeating := true
+				repeater := idStr[:numDigits]
+
+				// fail fast if numDigits can't possibly work
+				if len(idStr)%numDigits != 0 {
+					continue
+				}
+
+				for startIdx := numDigits; startIdx+numDigits <= len(idStr); startIdx += numDigits {
+					endIdx := startIdx + numDigits
+					if repeater != idStr[startIdx:endIdx] {
+						isRepeating = false
+						break
+					}
+				}
+
+				if isRepeating {
+					accumulator += id
+					break
+				}
+			}
+		}
+	}
+
+	fmt.Printf("Star 2 answer: %d \n", accumulator)
 }
