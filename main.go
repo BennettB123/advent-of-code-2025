@@ -34,6 +34,8 @@ func main() {
 		days.Day1(fileContents)
 	case 2:
 		days.Day2(fileContents)
+	case 3:
+		days.Day3(fileContents)
 	default:
 		fmt.Printf("Invalid day. Only %d days are complete", NumDays)
 		os.Exit(1)
