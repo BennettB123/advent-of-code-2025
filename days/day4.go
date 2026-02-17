@@ -6,13 +6,6 @@ import (
 )
 
 func Day4(input []byte) {
-	day4_star1(input)
-	day4_star2(input)
-}
-
-const PaperRoll = '@'
-
-func day4_star1(input []byte) {
 	grid := make([][]rune, 0)
 	for line := range strings.Lines(string(input)) {
 		line = strings.TrimSpace(line)
@@ -24,6 +17,14 @@ func day4_star1(input []byte) {
 		grid = append(grid, row)
 	}
 
+	day4_star1(grid)
+	day4_star2(grid)
+}
+
+const PaperRoll = '@'
+const NoPaperRoll = '.'
+
+func day4_star1(grid [][]rune) {
 	height := len(grid)
 	width := len(grid[0])
 
@@ -35,18 +36,7 @@ func day4_star1(input []byte) {
 				continue
 			}
 
-			numNeighbors := 0
-			for dx := -1; dx <= 1; dx++ {
-				for dy := -1; dy <= 1; dy++ {
-					if dx == 0 && dy == 0 {
-						continue
-					}
-
-					if r, _ := getAt(grid, x+dx, y+dy); r == PaperRoll {
-						numNeighbors++
-					}
-				}
-			}
+			numNeighbors := numNeighbors(grid, x, y)
 
 			if numNeighbors < 4 {
 				numRolls++
@@ -54,11 +44,42 @@ func day4_star1(input []byte) {
 		}
 	}
 
-	fmt.Printf("Star 2 answer: %d \n", numRolls)
+	fmt.Printf("Star 1 answer: %d \n", numRolls)
 }
 
-func day4_star2(input []byte) {
-	fmt.Printf("Star 2 answer: todo \n")
+func day4_star2(grid [][]rune) {
+	height := len(grid)
+	width := len(grid[0])
+
+	tmpGrid := make([][]rune, len(grid))
+	copy(tmpGrid, grid)
+
+	numRollsRemoved := 0
+	justRemoved := -1
+
+	for justRemoved != 0 {
+		justRemoved = 0
+
+		for y := range height {
+			for x := range width {
+				if r, _ := getAt(grid, x, y); r != PaperRoll {
+					continue
+				}
+
+				numNeighbors := numNeighbors(grid, x, y)
+
+				if numNeighbors < 4 {
+					numRollsRemoved++
+					justRemoved++
+					tmpGrid[y][x] = NoPaperRoll
+				}
+			}
+		}
+
+		copy(grid, tmpGrid)
+	}
+
+	fmt.Printf("Star 2 answer: %d \n", numRollsRemoved)
 }
 
 func getAt(grid [][]rune, x, y int) (rune, error) {
@@ -67,4 +88,22 @@ func getAt(grid [][]rune, x, y int) (rune, error) {
 	}
 
 	return grid[y][x], nil
+}
+
+func numNeighbors(grid [][]rune, x, y int) int {
+	numNeighbors := 0
+
+	for dx := -1; dx <= 1; dx++ {
+		for dy := -1; dy <= 1; dy++ {
+			if dx == 0 && dy == 0 {
+				continue
+			}
+
+			if r, _ := getAt(grid, x+dx, y+dy); r == PaperRoll {
+				numNeighbors++
+			}
+		}
+	}
+
+	return numNeighbors
 }
