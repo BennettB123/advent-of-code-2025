@@ -10,7 +10,7 @@ I'll be using the [go programming language](https://go.dev/) and I'm going to fo
 - [X] Day 3
 - [X] Day 4
 - [X] Day 5
-- [ ] Day 6
+- [X] Day 6
 - [ ] Day 7
 - [ ] Day 8
 - [ ] Day 9

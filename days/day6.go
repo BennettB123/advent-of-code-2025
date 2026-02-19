@@ -3,6 +3,7 @@ package days
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -94,6 +95,84 @@ func day6_star1(input []byte) {
 	fmt.Printf("Star 1 answer: %d \n", accumulator)
 }
 
+// represents the location for a problem (a column of numbers and an operator)
+// within the input file
+type problemChunk struct {
+	index int // the starting point of the problem
+	span  int // number of digits until the next column
+}
+
 func day6_star2(input []byte) {
-	fmt.Printf("Star 2 answer: %d \n", 0)
+	problemChunks := make([]problemChunk, 0)
+	lines := slices.Collect(strings.Lines(string(input)))
+	// remove trailing newlines from each line
+	for i := range len(lines) {
+		lines[i] = strings.TrimRight(lines[i], "\r\n")
+	}
+
+	chunkStart := 0
+	for col := range len(lines[0]) {
+		emptyCol := true
+		for row := range len(lines) {
+			// if this isn't a column of all spaces, go to next column
+			if lines[row][col] != ' ' {
+				emptyCol = false
+			}
+		}
+
+		if emptyCol {
+			chunk := problemChunk{index: chunkStart, span: col - chunkStart}
+			problemChunks = append(problemChunks, chunk)
+			chunkStart = col + 1
+		}
+	}
+
+	chunk := problemChunk{index: chunkStart, span: len(lines[0]) - chunkStart}
+	problemChunks = append(problemChunks, chunk)
+
+	accumulator := 0
+	for _, chunk := range problemChunks {
+		accumulator += solveProblem(lines, chunk)
+	}
+
+	fmt.Printf("Star 2 answer: %d \n", accumulator)
+}
+
+func solveProblem(lines []string, chunk problemChunk) int {
+	nums := make([]int, 0)
+	operator := strings.TrimSpace(lines[len(lines)-1][chunk.index : chunk.index+chunk.span])
+
+	for col := range chunk.span {
+		numStr := ""
+		for row := range len(lines) - 1 {
+			if lines[row][col+chunk.index] != ' ' {
+				numStr += string(lines[row][col+chunk.index])
+			}
+		}
+
+		num, err := strconv.Atoi(numStr)
+		if err != nil {
+			fmt.Printf("Error converting string '%s' to int. Error: %s", numStr, err)
+			os.Exit(1)
+		}
+		nums = append(nums, num)
+	}
+
+	result := 0
+	if operator == "*" {
+		result = 1
+		for _, num := range nums {
+			result *= num
+		}
+
+	} else if operator == "+" {
+		for _, num := range nums {
+			result += num
+		}
+	} else {
+		fmt.Printf("Invalid operator found '%s'", operator)
+		os.Exit(1)
+	}
+
+	return result
 }
