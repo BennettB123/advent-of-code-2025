@@ -17,8 +17,7 @@ func Day8(input []byte) {
 		lines[i] = strings.TrimSpace(lines[i])
 	}
 
-	day8_star1(lines)
-	day8_star2(lines)
+	solve(lines)
 }
 
 type point struct {
@@ -48,7 +47,7 @@ func getDistance(p1, p2 point) float64 {
 	return math.Sqrt(x2 + y2 + z2)
 }
 
-func day8_star1(lines []string) {
+func solve(lines []string) {
 	points := make([]point, 0)
 	circuits := make([]map[point]bool, 0)
 
@@ -131,8 +130,36 @@ func day8_star1(lines []string) {
 	})
 
 	fmt.Printf("Star 1 answer: %d \n", len(circuits[0])*len(circuits[1])*len(circuits[2]))
-}
 
-func day8_star2(lines []string) {
-	fmt.Printf("Star 2 answer: %d \n", 0)
+	////////// BEGIN STAR 2 //////////
+	part2Answer := -1
+
+	// same circuit building algo as before,
+	//   just start at where we left off and stop when there's 1 circuit
+	for i := len(points); i < len(distances); i++ {
+		c1Idx := -1
+		c2Idx := -1
+		for j, circuit := range circuits {
+			if circuit[distances[i].points.p1] {
+				c1Idx = j
+			}
+
+			if circuit[distances[i].points.p2] {
+				c2Idx = j
+			}
+		}
+
+		if c1Idx == c2Idx {
+			continue
+		}
+
+		maps.Copy(circuits[c1Idx], circuits[c2Idx])
+		circuits = slices.Delete(circuits, c2Idx, c2Idx+1)
+
+		if len(circuits) == 1 {
+			part2Answer = distances[i].points.p1.x * distances[i].points.p2.x
+		}
+	}
+
+	fmt.Printf("Star 2 answer: %d \n", part2Answer)
 }
